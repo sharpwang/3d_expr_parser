@@ -1,0 +1,57 @@
+atom:				: id
+					| num
+					| function
+					;
+varlist_0:          : null
+					| ',' expression
+					| varlist_0
+					;
+varlist:			: expression varlist_0
+					;
+function			: hanzi (' varlist ')'
+					;					
+expression			: expression_t expression_1
+					;
+expression_1		: null
+					| '+' expression_t expression_1
+					| '-' expression_t expression_1					
+					;
+expression_t		: expression_f expression_t_1
+					;
+expression_t_1		: null
+					| '*' expression_f expression_t_1
+					| '/' expression_f expression_t_1					
+					;
+expression_f		: '(' expression ')'
+					| atom
+					;										
+filter				: filter_t filter_1
+					;
+filter_1			: null
+					| '||' filter_t filter_1
+					;
+filter_t			: filter_f filter_t_1
+					;
+filter_t_1			: null
+					| '&&' filter_f filter_t_1
+					;
+filter_f			: '(' filter ')'
+					| hanzi filter_e 
+filter_e			: '>' expression
+					| '<' expression
+					| '>=' expression
+					| '<=' expression
+					| '==' expression
+					| '!=' expression
+					;
+assign				: id ':=' expression
+					;
+statement			: filter
+					| assign
+					| ;
+					| null
+					;
+statements			: statement statements
+					;
+
+					
