@@ -40,6 +40,7 @@ public:
 	void function();
 	void varlist();
 	void varlist_0();
+	void push_var(Token* tok);
 
 	void error(wstring ws);
 	Parser(Lexer* l);

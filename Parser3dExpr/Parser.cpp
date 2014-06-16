@@ -3,6 +3,7 @@
 #include "Word.h"
 #include<stdexcept>
 #include<exception>
+#include<iostream>
 
 using namespace std;
 
@@ -60,9 +61,13 @@ void Parser::stmt(){
 
 void Parser::assign(){
 	Word* w = (Word*)look;
+	Token* tok = look;
 	match(Tag::ID);
+	push_var(tok);
+	tok = look;
 	match(Tag::ASN);
 	expression();
+	push_var(tok);
 	//env.setid(w->lexeme, expression()); 
 }
 
@@ -73,26 +78,29 @@ void Parser::filter(){
 
 void Parser::filter_1(){
 	if (look->tag == Tag::OR){
+		Token* tok = look;
 		match(Tag::OR);
 		filter_t();
 		filter_1();
+		push_var(tok);
 	}
 }
 
 void Parser::filter_e(){
+	Token* tok = look;
 	switch (look->tag){
 	case Tag::LT:
-		match(Tag::LT); break;
+		match(Tag::LT); push_var(tok); break;
 	case Tag::GT:
-		match(Tag::GT); break;
+		match(Tag::GT); push_var(tok); break;
 	case Tag::LE:
-		match(Tag::LE); break;
+		match(Tag::LE); push_var(tok); break;
 	case Tag::GE:
-		match(Tag::GE); break;
+		match(Tag::GE); push_var(tok); break;
 	case Tag::EQ:
-		match(Tag::EQ); break;
+		match(Tag::EQ); push_var(tok); break;
 	case Tag::NE:
-		match(Tag::NE); break;
+		match(Tag::NE); push_var(tok); break;
 	default:
 		error(L"”Ô∑®¥ÌŒÛ");
 	}
@@ -106,8 +114,10 @@ void Parser::filter_f(){
 		match(Tag::RP);
 	}
 	else{
+		Token* tok = look;
 		match(Tag::HANZ);
 		filter_e();
+		push_var(tok);
 	}
 }
 
@@ -119,9 +129,11 @@ void Parser::filter_t(){
 
 void Parser::filter_t_1(){
 	if (look->tag == Tag::AND){
+		Token* tok = look;
 		match(Tag::AND);
 		filter_f();
 		filter_t_1();
+		push_var(tok);
 	}
 
 }
@@ -154,39 +166,51 @@ void Parser::expression_t()
 
 void Parser::expression_t_1()
 {
-	if (look->tag == L'*'){
-		match(L'*');
+	if (look->tag == Tag::MULTI){
+		Token* tok = look;
+		match(Tag::MULTI);
 		expression_f();
 		expression_t_1();
+		push_var(tok);
 	}
-	if (look->tag == L'/'){
-		match(L'/');
+	if (look->tag == Tag::DIV){
+		Token* tok = look;
+		match(Tag::DIV);
 		expression_f();
 		expression_t_1();
+		push_var(tok);
 	}
 }
 
 void Parser::expression_1()
 {
-	if (look->tag == L'+'){
-		match(L'+');
+	if (look->tag == Tag::PLUS){
+		Token* tok = look;
+		match(Tag::PLUS);
 		expression_t();
 		expression_1();
+		push_var(tok);
 	}
-	if (look->tag == L'-'){
-		match(L'-');
+	if (look->tag == Tag::MINUS){
+		Token* tok = look;
+		match(Tag::MINUS);
 		expression_t();
 		expression_1();
+		push_var(tok);
 	}
 }
 
 void Parser::atom()
 {
 	if (look->tag == Tag::ID){
+		Token* tok = look;
 		match(Tag::ID);
+		push_var(tok);
 	}
 	else if (look->tag == Tag::NUM){
+		Token* tok = look;
 		match(Tag::NUM);
+		push_var(tok);
 	}
 	else if (look->tag == Tag::HANZ){
 		function();
@@ -196,10 +220,12 @@ void Parser::atom()
 
 void Parser::function()
 {
+	Token* tok = look;
 	match(Tag::HANZ);
 	match(Tag::LP);
 	varlist();
 	match(Tag::RP);
+	push_var(tok);
 
 }
 
@@ -235,4 +261,10 @@ void Parser::statement()
 		match(Tag::EOL);
 	else
 		error(L"”Ô∑®¥ÌŒÛ");
+}
+
+void Parser::push_var(Token* tok)
+{
+
+	wcout <<  tok->lexeme << endl;
 }

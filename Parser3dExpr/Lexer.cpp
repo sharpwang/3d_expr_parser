@@ -55,8 +55,7 @@ Token* Lexer::scan()
 			ws = ws + peek;
 			readch();
 		} while (peek > 0x4e00 && peek < 0x9fa5);
-		Word* w = new Word(ws, Tag::HANZ);
-		words.insert(pair<wstring, Token*>(w->lexeme, w));
+		Token* w = new Token(Tag::HANZ, ws);
 		return w;
 	}
 
@@ -64,35 +63,43 @@ Token* Lexer::scan()
 	{
 	case L':':
 	case L'£º':
-		if (readch(L'=')) return new Word(L":=", Tag::ASN); else return new Token(L':'); break;
+		if (readch(L'=')) return new Token(Tag::ASN, L":=" ); else return new Token(L':'); break;
 	case L'=':
-		if (readch(L'=')) return new Word(L"==", Tag::EQ); else return new Token(L'='); break;
+		if (readch(L'=')) return new Token(Tag::EQ, L"==" ); else return new Token(L'='); break;
 	case L'>':
-		if (readch(L'=')) return new Word(L">=", Tag::GE); else return new Word(L">", Tag::GT); break;
+		if (readch(L'=')) return new Token(Tag::GE, L">="); else return new Token(Tag::GT, L">"); break;
 	case L'<':
-		if (readch(L'=')) return new Word(L"<=", Tag::LE); else return new Word(L"<", Tag::LT); break;
+		if (readch(L'=')) return new Token(Tag::LE, L"<="); else return new Token(Tag::LT, L"<"); break;
 	case L'!':
 	case L'£¡':
-		if (readch(L'=')) return new Word(L"!=", Tag::NE); else return new Token(L'!'); break;
+		if (readch(L'=')) return new Token(Tag::NE, L"!="); else return new Token(L'!'); break;
 	case L'(':
 	case L'£¨':
-		peek = L' '; return new Word(L"(", Tag::LP); break;
+		peek = L' '; return new Token(Tag::LP, L"("); break;
 	case L')':
 	case L'£©':
-		peek = L' '; return new Word(L")", Tag::RP); break;
+		peek = L' '; return new Token(Tag::RP, L")" ); break;
 	case L'\n':
 	case L';':
 	case L'£»':
-		peek = L' '; line = line + 1;  return new Word(L";", Tag::EOL); break;
+		peek = L' '; line = line + 1;  return new Token( Tag::EOL, L";"); break;
 	case L'|':
-		if (readch(L'|')) return new Word(L"||", Tag::OR); else return new Token(L'|'); break;
+		if (readch(L'|')) return new Token(Tag::OR, L"||"); else return new Token(L'|'); break;
 	case L'&':
-		if (readch(L'&')) return new Word(L"&&", Tag::AND); else return new Token(L'&'); break;
+		if (readch(L'&')) return new Token(Tag::AND, L"&&"); else return new Token(L'&'); break;
 	case L'\0':
-		return new Word(L"#", Tag::END); break;
+		return new Token(Tag::END, L"#"); break;
 	case L',':
 	case L'£¬':
-		peek = L' '; return new Word(L",", Tag::COMA); break;
+		peek = L' '; return new Token(Tag::COMA, L","); break;
+	case L'+':
+		peek = L' '; return new Token(Tag::PLUS, L"+"); break;
+	case L'-':
+		peek = L' '; return new Token(Tag::MINUS, L"-"); break;
+	case L'*':
+		peek = L' '; return new Token(Tag::MULTI, L"*"); break;
+	case L'/':
+		peek = L' '; return new Token(Tag::DIV, L"/"); break;
 	default:
 		break;
 	}
@@ -102,7 +109,7 @@ Token* Lexer::scan()
 		do {
 			v = 10 * v + (peek - 48); readch();
 		} while (peek < 256 && isdigit(peek));
-		return new Num(v);
+		return new Token(Tag::ID, to_wstring(v), v);
 	}
 
 	if (peek < 256 && isalpha(peek)) {
@@ -110,16 +117,8 @@ Token* Lexer::scan()
 		do {
 			ws = ws + peek; readch();
 		} while (peek < 256 && isalpha(peek));
-		map<wstring, Token*>::iterator iter =  words.find(ws);
-		Word* w;
-		if (iter != words.end()){
-			w = (Word*)iter->second;
-		}
-		else{
-			w = new Word(ws, Tag::ID);
-			words.insert(pair<wstring, Token*>(ws, w));
-		}
-		return w;
+		Token* tok = new Token(Tag::ID, ws);
+		return tok;
 	}
 
 	Token* tok = new Token(peek); peek = L' ';

@@ -12,7 +12,8 @@ public:
 		EOL = 266, END = 267,  //行尾,程序尾
 		AND = 268, OR = 269,
 		COMA = 270,
-		LT = 271, GT = 272    //小于，大于
+		LT = 271, GT = 272,    //小于，大于
+		PLUS = 273, MINUS = 274, MULTI = 275, DIV = 276 
 	};
 };
 
@@ -21,10 +22,13 @@ class Token
 {
 public:
 	int tag;
-
+	wstring lexeme;
+	int value;
 	virtual wstring tostring();
 	Token();
 	Token(int t);
+	Token(int t, wstring ws);
+	Token(int t, wstring ws, int v);
 	~Token();
 };
 

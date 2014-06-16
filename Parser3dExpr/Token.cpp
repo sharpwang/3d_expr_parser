@@ -12,13 +12,25 @@ Token::Token(int t)
 	tag = t;
 }
 
+Token::Token(int t, wstring ws)
+{
+	tag = t;
+	lexeme = ws;
+}
+
+Token::Token(int t, wstring ws, int v)
+{
+	tag = t;
+	lexeme = ws;
+	value = v;
+}
+
+
 Token::~Token()
 {
 }
 
 wstring Token::tostring()
 {
-	wstring ws;
-	ws = ws + (wchar_t)tag + L" ";
-	return ws;
+	return lexeme;
 }
