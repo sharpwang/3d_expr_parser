@@ -41,23 +41,6 @@ void Parser::error(wstring s) {
 }
 
 
-void Parser::start(){
-	while (look.tag != Tag::END)
-	{
-		stmt();
-	}		
-}
-
-void Parser::stmt(){
-	if (look.tag == Tag::EOL)
-		match(Tag::EOL);
-	else if (look.tag == Tag::ID)
-		assign();
-	else if (look.tag == Tag::HANZ)
-		filter();
-	match(Tag::EOL);
-}
-
 void Parser::assign(){
 	Token tok1 = look;
 	match(Tag::ID);
@@ -254,6 +237,7 @@ void Parser::statements()
 	while (look.tag != Tag::END){
 		statement();
 	}
+	push_var(look);
 }
 
 void Parser::statement()

@@ -22,8 +22,6 @@ private:
 public:
 	void move();
 	void match(int t);
-	void start();
-	void stmt();
 	void assign();
 	void filter();
 	void filter_t();
