@@ -5,6 +5,7 @@
 #include"Env.h"
 #include<string>
 #include<map>
+#include<stack>
 
 using namespace std;
 
@@ -13,8 +14,9 @@ class Parser
 {
 private:
 	Env env;
-	Lexer* lex;
-	Token* look;
+	Lexer lex;
+	Token look;
+
 
 
 public:
@@ -40,10 +42,10 @@ public:
 	void function();
 	void varlist();
 	void varlist_0();
-	void push_var(Token* tok);
+	void push_var(Token tok);
 
 	void error(wstring ws);
-	Parser(Lexer* l);
+	Parser(Lexer l);
 	Parser();
 	~Parser();
 };

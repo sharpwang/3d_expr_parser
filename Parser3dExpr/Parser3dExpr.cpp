@@ -13,8 +13,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	setlocale(LC_ALL, "chs");
 
-	Lexer lex(L"跨度 == 上期(18)&&( 十位==(百位(上期(10))+4)|| 百位 ！= 5); A:=100");
-	Token* tok;
+	Lexer lex(L"A:=100 + 9 / (3 + (2 + 1 )* 2); B:=A * 2");
 	wstring ws;
 	//do{
 	//	tok = lex.scan();
@@ -23,7 +22,7 @@ int _tmain(int argc, _TCHAR* argv[])
 
 	//wcout << ws;
 
-	Parser parser(&lex);
+	Parser parser(lex);
 	parser.statements();
 	return 0;
 }

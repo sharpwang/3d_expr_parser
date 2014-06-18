@@ -37,6 +37,7 @@ filter_t_1			: null
 					;
 filter_f			: '(' filter ')'
 					| hanzi filter_e 
+					;
 filter_e			: '>' expression
 					| '<' expression
 					| '>=' expression

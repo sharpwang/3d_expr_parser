@@ -8,12 +8,14 @@ class Tag
 public:
 	enum{
 		ID = 256, EQ = 257, NE = 258, LE = 259, GE = 260, ASN = 261, NUM = 262, HANZ = 263,
-		LP = 264, RP = 265, //圆括号
-		EOL = 266, END = 267,  //行尾,程序尾
+		LP = 264, RP = 265,										//圆括号
+		EOL = 266, END = 267,									//行尾,程序尾
 		AND = 268, OR = 269,
 		COMA = 270,
-		LT = 271, GT = 272,    //小于，大于
-		PLUS = 273, MINUS = 274, MULTI = 275, DIV = 276 
+		LT = 271, GT = 272,										//小于，大于
+		PLUS = 273, MINUS = 274, MULTI = 275, DIV = 276,
+		FLT = 277, FNC = 278,									//根据语义分析，把HANZ = 263的Token修改为两个中的其中一个
+		DEF = 279, REF =  280									//根据语义分析，把ID = 256的Token分为定义项和引用项
 	};
 };
 

@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "Lexer.h"
-#include "Word.h"
-#include "Num.h"
 
 using namespace std;
 
@@ -17,6 +15,15 @@ Lexer::Lexer(std::wstring ws) :peek(L' '),line(0), pos(0)
 Lexer::~Lexer()
 {
 }
+
+void Lexer::setsource(wstring ws)
+{
+	source = ws;
+	peek = L' ';
+	line = 0;
+	pos = 0;
+}
+
 
 void Lexer::readch()
 {
@@ -41,7 +48,7 @@ bool Lexer::readch(wchar_t c)
 	return true;
 }
 
-Token* Lexer::scan()
+Token Lexer::scan()
 {
 	for (;; readch()) {
 		if (peek ==  L' ' || peek == L'\t') continue;
@@ -55,7 +62,7 @@ Token* Lexer::scan()
 			ws = ws + peek;
 			readch();
 		} while (peek > 0x4e00 && peek < 0x9fa5);
-		Token* w = new Token(Tag::HANZ, ws);
+		Token w = Token(Tag::HANZ, ws);
 		return w;
 	}
 
@@ -63,43 +70,43 @@ Token* Lexer::scan()
 	{
 	case L':':
 	case L'£º':
-		if (readch(L'=')) return new Token(Tag::ASN, L":=" ); else return new Token(L':'); break;
+		if (readch(L'=')) return Token(Tag::ASN, L":=" ); else return Token(L':'); break;
 	case L'=':
-		if (readch(L'=')) return new Token(Tag::EQ, L"==" ); else return new Token(L'='); break;
+		if (readch(L'=')) return Token(Tag::EQ, L"==" ); else return Token(L'='); break;
 	case L'>':
-		if (readch(L'=')) return new Token(Tag::GE, L">="); else return new Token(Tag::GT, L">"); break;
+		if (readch(L'=')) return Token(Tag::GE, L">="); else return Token(Tag::GT, L">"); break;
 	case L'<':
-		if (readch(L'=')) return new Token(Tag::LE, L"<="); else return new Token(Tag::LT, L"<"); break;
+		if (readch(L'=')) return Token(Tag::LE, L"<="); else return Token(Tag::LT, L"<"); break;
 	case L'!':
 	case L'£¡':
-		if (readch(L'=')) return new Token(Tag::NE, L"!="); else return new Token(L'!'); break;
+		if (readch(L'=')) return Token(Tag::NE, L"!="); else return Token(L'!'); break;
 	case L'(':
 	case L'£¨':
-		peek = L' '; return new Token(Tag::LP, L"("); break;
+		peek = L' '; return Token(Tag::LP, L"("); break;
 	case L')':
 	case L'£©':
-		peek = L' '; return new Token(Tag::RP, L")" ); break;
+		peek = L' '; return Token(Tag::RP, L")" ); break;
 	case L'\n':
 	case L';':
 	case L'£»':
-		peek = L' '; line = line + 1;  return new Token( Tag::EOL, L";"); break;
+		peek = L' '; line = line + 1;  return Token( Tag::EOL, L";"); break;
 	case L'|':
-		if (readch(L'|')) return new Token(Tag::OR, L"||"); else return new Token(L'|'); break;
+		if (readch(L'|')) return Token(Tag::OR, L"||"); else return Token(L'|'); break;
 	case L'&':
-		if (readch(L'&')) return new Token(Tag::AND, L"&&"); else return new Token(L'&'); break;
+		if (readch(L'&')) return Token(Tag::AND, L"&&"); else return Token(L'&'); break;
 	case L'\0':
-		return new Token(Tag::END, L"#"); break;
+		return Token(Tag::END, L"#"); break;
 	case L',':
 	case L'£¬':
-		peek = L' '; return new Token(Tag::COMA, L","); break;
+		peek = L' '; return Token(Tag::COMA, L","); break;
 	case L'+':
-		peek = L' '; return new Token(Tag::PLUS, L"+"); break;
+		peek = L' '; return Token(Tag::PLUS, L"+"); break;
 	case L'-':
-		peek = L' '; return new Token(Tag::MINUS, L"-"); break;
+		peek = L' '; return Token(Tag::MINUS, L"-"); break;
 	case L'*':
-		peek = L' '; return new Token(Tag::MULTI, L"*"); break;
+		peek = L' '; return Token(Tag::MULTI, L"*"); break;
 	case L'/':
-		peek = L' '; return new Token(Tag::DIV, L"/"); break;
+		peek = L' '; return Token(Tag::DIV, L"/"); break;
 	default:
 		break;
 	}
@@ -109,7 +116,7 @@ Token* Lexer::scan()
 		do {
 			v = 10 * v + (peek - 48); readch();
 		} while (peek < 256 && isdigit(peek));
-		return new Token(Tag::ID, to_wstring(v), v);
+		return Token(Tag::NUM, to_wstring(v), v);
 	}
 
 	if (peek < 256 && isalpha(peek)) {
@@ -117,10 +124,10 @@ Token* Lexer::scan()
 		do {
 			ws = ws + peek; readch();
 		} while (peek < 256 && isalpha(peek));
-		Token* tok = new Token(Tag::ID, ws);
+		Token tok = Token(Tag::ID, ws);
 		return tok;
 	}
 
-	Token* tok = new Token(peek); peek = L' ';
+	Token tok = Token(peek); peek = L' ';
 	return tok;
 }
