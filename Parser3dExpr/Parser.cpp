@@ -6,14 +6,13 @@
 
 using namespace std;
 
-Parser::Parser()
+Parser::Parser() :skip_mode(false)
 {
 
 }
 
-Parser::Parser(Lexer l)
+Parser::Parser(Lexer l) : skip_mode(false), lex(l)
 {
-	lex = l;
 	move();
 }
 
@@ -48,7 +47,7 @@ void Parser::assign(){
 	push_var(tok1);
 	Token tok2 = look;
 	match(Tag::ASN);
-	expression();
+	condition();
 	push_var(tok2);
 
 	//env.setid(w->lexeme, expression()); 
@@ -65,6 +64,7 @@ void Parser::filter_1(){
 		match(Tag::OR);
 		filter_t();
 		filter_1();
+		tok.IntoFilt();
 		push_var(tok);
 	}
 }
@@ -88,6 +88,7 @@ void Parser::filter_e(){
 		error(L"语法错误");
 	}
 	expression();
+	tok.IntoFilt();
 	push_var(tok);
 
 }
@@ -119,6 +120,7 @@ void Parser::filter_t_1(){
 		match(Tag::AND);
 		filter_f();
 		filter_t_1();
+		tok.IntoFilt();
 		push_var(tok);
 	}
 
@@ -168,9 +170,12 @@ void Parser::condition_e()
 	case Tag::NE:
 		match(Tag::NE); break;
 	default:
-		error(L"语法错误");
+		return;														//error(L"语法错误"); 
+																	/*注释掉上一句是因为允许一个条件就是一个表达式，只不过这个条件的值等于表达式的值
+																	这样，一个条件语句返回的就可以是任何数值，而不仅仅是0或者1*/
 	}
 	expression();
+	tok.IntoCond();
 	push_var(tok);
 }
 
@@ -181,6 +186,7 @@ void Parser::condition_1()
 		match(Tag::OR);
 		condition_t();
 		condition_1();
+		tok.InCond();
 		push_var(tok);
 	}
 
@@ -193,6 +199,7 @@ void Parser::condition_t_1()
 		match(Tag::AND);
 		condition_f();
 		condition_t_1();
+		tok.InCond();
 		push_var(tok);
 	}
 }
@@ -308,13 +315,26 @@ void Parser::varlist_0()
 	}
 }
 
+void Parser::set_skip_mode()
+{
+	skip_mode = false;
+	for (int i = 0; i < conds.size(); i++)
+	{
+		if (conds.at(i).value == 0) skip_mode = true;
+	}
+}
+
 void Parser::ifthen()
 {
 	match(Tag::IF);
 	match(Tag::LP);
 	condition();
 	match(Tag::COMA);
+	conds.push_back(env.pop());
+	set_skip_mode();
 	statement_1();
+	conds.pop_back();
+	set_skip_mode();
 	match(Tag::RP);
 }
 
@@ -350,6 +370,6 @@ void Parser::statement()
 void Parser::push_var(Token tok)
 {
 	wcout << tok.lexeme << endl;
-	env.put(tok);
-
+	if (skip_mode == false)
+		env.put(tok);
 }

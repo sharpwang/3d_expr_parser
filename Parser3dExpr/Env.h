@@ -43,6 +43,7 @@ public:
 	void or();
 	void and();
 	void end();
+	void cond(Token tok);
 	void fnc(wstring ws, int tag);
 
 

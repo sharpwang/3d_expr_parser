@@ -24,14 +24,20 @@ public:
 class Token
 {
 public:
+	enum{ COND = 11, FILT = 22 };
 	int tag;
 	wstring lexeme;
 	int value;
+	int state;													//标明当前符号所在的语句状态； CND 或者 FLT
 	virtual wstring tostring();
 	Token();
 	Token(int t);
 	Token(int t, wstring ws);
 	Token(int t, wstring ws, int v);
+	inline void IntoCond(){ state = COND; }
+	inline void IntoFilt(){ state = FILT; }
+	inline bool InCond(){ return state == COND; }
+	inline bool InFilt(){ return state == FILT; }
 	~Token();
 };
 

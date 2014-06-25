@@ -273,7 +273,7 @@ void Env::put(Token tok){
 	case Tag::GE:
 	case Tag::LT:
 	case Tag::GT:
-		toks.push(tok);
+		cond(tok);
 		break;
 	case Tag::OR:
 		or();
@@ -510,4 +510,34 @@ void Env::and(){
 	set<int> v3;
 	set_intersection(v1.begin(), v1.end(), v2.begin(), v2.end(), inserter(v3,v3.begin()));
 	output.push(v3);
+}
+
+void Env::cond(Token tok){
+	if (tok.InFilt()) {
+		toks.push(tok);
+		return;
+	}
+	else{															//tok.InCond() == true
+		Token tok1 = pop();
+		Token tok2 = pop();
+		int value = 0;
+		switch (tok.tag){
+			case Tag::EQ:
+				value = tok2.value == tok1.value; break;
+			case Tag::NE:
+				value = tok2.value != tok1.value; break;
+			case Tag::LE:
+				value = tok2.value <= tok1.value; break;
+			case Tag::GE:
+				value = tok2.value >= tok1.value; break;
+			case Tag::LT:
+				value = tok2.value < tok1.value; break;
+			case Tag::GT:
+				value = tok2.value > tok1.value; break;
+			default:
+				throw Trouble(L"非法比较符");
+		}
+		toks.push(Token(tok.tag, to_wstring(value), value));
+		return;
+	}
 }

@@ -6,6 +6,7 @@
 #include<string>
 #include<map>
 #include<stack>
+#include<vector>
 
 using namespace std;
 
@@ -16,6 +17,8 @@ private:
 	Env env;
 	Lexer lex;
 	Token look;
+	bool skip_mode;
+	vector<Token> conds;												//用于嵌套语句中对IFTHEN中条件的处理，如果上一层语句属于应跳过的，这本语句也不予以处理
 
 
 
@@ -49,6 +52,7 @@ public:
 	void varlist();
 	void varlist_0();
 	void push_var(Token tok);
+	void set_skip_mode();
 
 	void error(wstring ws);
 	Parser(Lexer l);

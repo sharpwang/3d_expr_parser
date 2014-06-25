@@ -46,7 +46,7 @@ filter_e			: '>' expression
 					| '==' expression
 					| '!=' expression
 					;
-assign				: id ':=' expression
+assign				: id ':=' condition
 					;
 condition			: condition_t condition_1
 					;
@@ -67,6 +67,7 @@ condition_e			: expression '>' expression
 					| expression '<=' expression
 					| expression '==' expression
 					| expression '!=' expression
+					| expression
 					;
 ifthen				: '¼ÙÈç' '(' condition ',' statement_1 ')'
 					;
