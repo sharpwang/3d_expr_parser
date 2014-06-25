@@ -27,7 +27,7 @@ void Lexer::setsource(wstring ws)
 
 void Lexer::readch()
 {
-	if (pos > source.length()){
+	if (pos > (int)source.length()){
 		peek = L'\0';
 	}
 	else if (pos == source.length()){
@@ -56,15 +56,6 @@ Token Lexer::scan()
 			break;
 	}
 
-	if (peek > 0x4e00 && peek < 0x9fa5){ //4e00~9fa5是Unicode中中文汉字的编码范围
-		wstring ws = L"";
-		do{
-			ws = ws + peek;
-			readch();
-		} while (peek > 0x4e00 && peek < 0x9fa5);
-		Token w = Token(Tag::HANZ, ws);
-		return w;
-	}
 
 	switch (peek)
 	{
@@ -109,6 +100,20 @@ Token Lexer::scan()
 		peek = L' '; return Token(Tag::DIV, L"/"); break;
 	default:
 		break;
+	}
+
+	if (peek > 0x4e00 && peek < 0x9fa5){ //4e00~9fa5是Unicode中中文汉字的编码范围
+		wstring ws = L"";
+		do{
+			ws = ws + peek;
+			readch();
+		} while (peek > 0x4e00 && peek < 0x9fa5);
+		if (ws == L"假如" || ws == L"如果" || ws == L"假设"){
+			Token w = Token(Tag::IF, ws);
+			return w;
+		}
+		Token w = Token(Tag::HANZ, ws);
+		return w;
 	}
 
 	if (peek < 256 && isdigit(peek)){

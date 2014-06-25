@@ -124,6 +124,78 @@ void Parser::filter_t_1(){
 
 }
 
+void Parser::condition()
+{
+	condition_t();
+	condition_1();
+}
+
+void Parser::condition_t()
+{
+	condition_f();
+	condition_t_1();
+
+}
+
+void Parser::condition_f()
+{
+	if (look.tag == Tag::LP){
+		match(Tag::LP);
+		condition();
+		match(Tag::RP);
+	}
+	else{
+		condition_e();
+	}
+
+}
+
+void Parser::condition_e()
+{
+	expression();
+	Token tok = look;
+	switch (look.tag){
+	case Tag::LT:
+		match(Tag::LT); break;
+	case Tag::GT:
+		match(Tag::GT);  break;
+	case Tag::LE:
+		match(Tag::LE); break;
+	case Tag::GE:
+		match(Tag::GE); break;
+	case Tag::EQ:
+		match(Tag::EQ); break;
+	case Tag::NE:
+		match(Tag::NE); break;
+	default:
+		error(L"语法错误");
+	}
+	expression();
+	push_var(tok);
+}
+
+void Parser::condition_1()
+{
+	if (look.tag == Tag::OR){
+		Token tok = look;
+		match(Tag::OR);
+		condition_t();
+		condition_1();
+		push_var(tok);
+	}
+
+}
+
+void Parser::condition_t_1()
+{
+	if (look.tag == Tag::AND){
+		Token tok = look;
+		match(Tag::AND);
+		condition_f();
+		condition_t_1();
+		push_var(tok);
+	}
+}
 
 void Parser::expression()
 {
@@ -186,6 +258,7 @@ void Parser::expression_1()
 	}
 }
 
+
 void Parser::atom()
 {
 	if (look.tag == Tag::ID){
@@ -209,10 +282,14 @@ void Parser::function()
 {
 	Token tok = look;
 	match(Tag::HANZ);
-	match(Tag::LP);
-	varlist();
-	match(Tag::RP);
-	tok.tag = Tag::FNC;													//重新定义Token的Tag属性，这是一个函数。
+	tok.tag = Tag::FNC0;												//重新定义Token的Tag属性，这是一个不带参数的函数。
+	if (look.tag == Tag::LP){											//这样就支持了不带参数的函数
+		tok.tag = Tag::FNC;												//这是一个带有参数的函数
+		match(Tag::LP);
+		varlist();
+		match(Tag::RP);
+	}
+																		//重新定义Token的Tag属性，这是一个函数。
 	push_var(tok);
 
 }
@@ -231,6 +308,16 @@ void Parser::varlist_0()
 	}
 }
 
+void Parser::ifthen()
+{
+	match(Tag::IF);
+	match(Tag::LP);
+	condition();
+	match(Tag::COMA);
+	statement_1();
+	match(Tag::RP);
+}
+
 
 void Parser::statements()
 {
@@ -240,16 +327,24 @@ void Parser::statements()
 	push_var(look);
 }
 
-void Parser::statement()
+void Parser::statement_1()
 {
 	if (look.tag == Tag::HANZ || look.tag == Tag::LP)
 		filter();
 	else if (look.tag == Tag::ID)
 		assign();
-	else if (look.tag == Tag::EOL)
-		match(Tag::EOL);
+	else if (look.tag == Tag::IF)
+		ifthen();
 	else
 		error(L"语法错误");
+}
+
+void Parser::statement()
+{
+	if (look.tag == Tag::EOL)
+		match(Tag::EOL);
+	else
+		statement_1();
 }
 
 void Parser::push_var(Token tok)

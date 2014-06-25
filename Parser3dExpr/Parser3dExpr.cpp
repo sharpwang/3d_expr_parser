@@ -13,7 +13,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	setlocale(LC_ALL, "chs");
 
-	Lexer lex(L"A:=5; (个位==A || 十位 == 5) && 百位 > 5");
+	Lexer lex(L"假如( 百位(上期) == 9 , A:= 1)");
 	wstring ws;
 	//do{
 	//	tok = lex.scan();

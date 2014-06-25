@@ -8,7 +8,8 @@ varlist_0:          : null
 					;
 varlist:			: expression varlist_0
 					;
-function			: hanzi (' varlist ')'
+function			: hanzi '(' varlist ')'
+					| hanzi
 					;					
 expression			: expression_t expression_1
 					;
@@ -47,10 +48,34 @@ filter_e			: '>' expression
 					;
 assign				: id ':=' expression
 					;
-statement			: filter
+condition			: condition_t condition_1
+					;
+condition_1			: null
+					| '||' condition_t condition_1
+					;
+condition_t			: condition_f condition_t_1
+					;
+condition_t_1		: null
+					| '&&' condition_f condition_t_1
+					;
+condition_f			: '(' condition ')'
+					| condition_e
+					;
+condition_e			: expression '>' expression
+					| expression '<' expression
+					| expression '>=' expression
+					| expression '<=' expression
+					| expression '==' expression
+					| expression '!=' expression
+					;
+ifthen				: '¼ÙÈç' '(' condition ',' statement_1 ')'
+					;
+statement_1			: filter
 					| assign
-					| ;
-					| null
+					| ifthen
+					;
+statement			: null
+					| statement_1
 					;
 statements			: statement statements
 					;
