@@ -282,6 +282,17 @@ void Parser::atom()
 	else if (look.tag == Tag::HANZ){
 		function();
 	}
+	else if (look.tag == Tag::LBRK){
+		Token tok = look;
+		match(Tag::LBRK);
+		push_var(tok);
+		atom();
+		list();
+		tok = look;
+		match(Tag::RBRK);
+		push_var(tok);
+
+	}
 	else error(L"语法错误");
 }
 
@@ -299,6 +310,14 @@ void Parser::function()
 																		//重新定义Token的Tag属性，这是一个函数。
 	push_var(tok);
 
+}
+
+void Parser::list()
+{
+	while (look.tag == Tag::COMA){
+		match(Tag::COMA);
+		atom();
+	}
 }
 
 void Parser::varlist()

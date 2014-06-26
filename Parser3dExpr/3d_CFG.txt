@@ -1,7 +1,12 @@
 atom:				: id
 					| num
 					| function
+					| '{' atom list '}'
 					;
+list:				: null
+					| ',' atom
+					| list
+					;					
 varlist_0:          : null
 					| ',' expression
 					| varlist_0

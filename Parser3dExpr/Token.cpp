@@ -3,24 +3,35 @@
 #include <sstream>
 
 
-Token::Token() :tag(0), value(0), state(0)
+void Token::Init()
 {
+	tag = 0;
+	value = 0;
+	state = 0;
 }
 
-Token::Token(int t):tag(0), value(0), state(0)
+Token::Token() 
 {
+	Init();
+}
+
+Token::Token(int t)
+{
+	Init();
 
 	tag = t;
 }
 
-Token::Token(int t, wstring ws) : value(0), state(0)
+Token::Token(int t, wstring ws)
 {
+	Init();
 	tag = t;
 	lexeme = ws;
 }
 
-Token::Token(int t, wstring ws, int v) :state(0)
+Token::Token(int t, wstring ws, int v) 
 {
+	Init();
 	tag = t;
 	lexeme = ws;
 	value = v;
@@ -35,3 +46,4 @@ wstring Token::tostring()
 {
 	return lexeme;
 }
+

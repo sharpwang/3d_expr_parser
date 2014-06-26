@@ -19,15 +19,15 @@ class Env
 		Draw(int q, int s, int k) :qh(q), sj(s), kj(k){};
 	};
 private:
-	map<wstring, int> ids;
+	map<wstring, Token> ids;
 	stack<Token> toks;
 	int pool[1000][3];
 	stack<set<int> > output;
 	vector<Draw> draws;
 public:
 	void loadraws();
-	void setid(wstring k, int v);
-	int getid(wstring k);
+	void setid(wstring k, Token v);
+	Token getid(wstring k);
 	void put(Token tok);
 	Token pop();
 
@@ -45,6 +45,7 @@ public:
 	void end();
 	void cond(Token tok);
 	void fnc(wstring ws, int tag);
+	void list();
 
 
 	void baiwei();

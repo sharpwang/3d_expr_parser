@@ -5,7 +5,8 @@
 #include <algorithm>
 #include <minmax.h>
 
-Env::Env()
+
+Env::Env() 
 {
 	for (int i = 0; i < 1000; i++){
 		pool[i][0] = i / 100;
@@ -223,15 +224,15 @@ void Env::loadraws()
 	draws.push_back(Draw(2014160, 903, 45));
 	draws.push_back(Draw(2014161, 986, 946));
 }
-void Env::setid(wstring k, int v)
+void Env::setid(wstring k, Token v)
 {
-	ids.insert(pair<wstring, int>(k, v));
-	wcout << k << L":=" << v << endl;
+	ids.insert(pair<wstring, Token>(k, v));
+//	wcout << k << L":=" << v << endl;
 }
 
-int Env::getid(wstring k)
+Token Env::getid(wstring k)
 {
-	map<wstring, int>::iterator it = ids.find(k);
+	map<wstring, Token>::iterator it = ids.find(k);
 	if (it == ids.end()){
 		throw Trouble(L"变量未定义");
 	} 
@@ -288,12 +289,32 @@ void Env::put(Token tok){
 	case Tag::FNC0:
 		fnc(tok.lexeme, tok.tag);
 		break;
+	case Tag::LBRK:
+		toks.push(tok);
+		break;
+	case Tag::RBRK:
+		list();
 	default:
 		break;
 	}
 	
 }
 
+void Env::list()
+{
+	Token tok = pop();
+	vector<Token> vtemp ;
+	while (tok.tag != Tag::LBRK){
+		vtemp.push_back(tok);
+		tok = pop();
+	}
+	Token temp(Tag::LIST);
+	while (vtemp.size()){
+		temp.children.push_back(vtemp.at(vtemp.size() - 1));
+		vtemp.pop_back();
+	}
+	toks.push(temp);
+}
 
 void Env::plus()
 {
@@ -342,9 +363,8 @@ void Env::def()
 
 void Env::ref(wstring ws)
 {
-	int v = getid(ws);
-	Token tok(Tag::NUM, to_wstring(v), v);
-	toks.push(tok);
+	Token v = getid(ws);
+	toks.push(v);
 }
 
 void Env::asn()

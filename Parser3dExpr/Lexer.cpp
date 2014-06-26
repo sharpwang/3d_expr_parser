@@ -77,6 +77,12 @@ Token Lexer::scan()
 	case L')':
 	case L'£©':
 		peek = L' '; return Token(Tag::RP, L")" ); break;
+	case L'[':
+	case L'¡¾':
+		peek = L' '; return Token(Tag::LBRK, L"["); break;
+	case L']':
+	case L'¡¿':
+		peek = L' '; return Token(Tag::RBRK, L"]"); break;
 	case L'\n':
 	case L';':
 	case L'£»':

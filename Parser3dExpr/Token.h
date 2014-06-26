@@ -1,5 +1,6 @@
 #pragma once
 #include<string>
+#include<vector>
 
 using namespace std;
 
@@ -16,19 +17,24 @@ public:
 		PLUS = 273, MINUS = 274, MULTI = 275, DIV = 276,
 		FLT = 277, FNC = 278, FNC0 = 281,						//根据语义分析，修改HANZ = 263的Token，FNC0表示不带参数的函数
 		DEF = 279, REF =  280,									//根据语义分析，把ID = 256的Token分为定义项和引用项
-		IF = 281												//逻辑判断语句 假如
+		IF = 281,												//逻辑判断语句 假如
+		LBRK = 282, RBRK = 283,									//中括号 bracket []
+		LIST = 284
 	};
 };
 
 
 class Token
 {
+private:
+	void Init();
 public:
 	enum{ COND = 11, FILT = 22 };
 	int tag;
 	wstring lexeme;
 	int value;
 	int state;													//标明当前符号所在的语句状态； CND 或者 FLT
+	vector<Token> children;
 	virtual wstring tostring();
 	Token();
 	Token(int t);

@@ -49,6 +49,7 @@ public:
 	void expression_t_1();
 	void atom();
 	void function();
+	void list();
 	void varlist();
 	void varlist_0();
 	void push_var(Token tok);
