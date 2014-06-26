@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "Env.h"
 #include "Trouble.h"
-#include<iostream>
+#include <iostream>
 #include <algorithm>
 #include <minmax.h>
+#include <set>
 
 
 Env::Env() 
@@ -289,10 +290,10 @@ void Env::put(Token tok){
 	case Tag::FNC0:
 		fnc(tok.lexeme, tok.tag);
 		break;
-	case Tag::LBRK:
+	case Tag::LBRC:
 		toks.push(tok);
 		break;
-	case Tag::RBRK:
+	case Tag::RBRC:
 		list();
 	default:
 		break;
@@ -304,7 +305,7 @@ void Env::list()
 {
 	Token tok = pop();
 	vector<Token> vtemp ;
-	while (tok.tag != Tag::LBRK){
+	while (tok.tag != Tag::LBRC){
 		vtemp.push_back(tok);
 		tok = pop();
 	}
@@ -371,8 +372,7 @@ void Env::asn()
 {
 	Token tok1 = pop();
 	Token tok2 = pop();
-	setid(tok2.lexeme, tok1.value);
-
+	setid(tok2.lexeme, tok1);
 }
 
 
@@ -382,8 +382,168 @@ Token Env::pop(){
 	return tok;
 }
 
+void Env::danma()
+{
+	Token op = pop();
+	Token tok = pop();
+	vector<int> dan1, dan2, dan3;
+
+	int list_count = 0;
+	if (tok.tag == Tag::NUM){
+		dan1.push_back(tok.value);
+	}
+	else if (tok.tag == Tag::LIST){
+		int sz = tok.children.size();
+		for (int i = 0; i < sz; i++){
+			if (tok.children.at(i).children.size() > 0){
+				list_count++;
+			}	
+		}
+		if (list_count == 0){
+			for (int j = 0; j < sz; j++){
+				dan1.push_back(tok.children.at(j).value);
+			}
+		}
+		else if(list_count == 1){
+			if (sz > list_count) throw Trouble(L"列表元素不合规范");
+			vector<Token> tmp1 = tok.children.at(0).children;
+			for (unsigned int j = 0; j < tmp1.size(); j++){
+				dan1.push_back(tmp1.at(j).value);
+			}
+		}
+		else if (list_count == 2){
+			if (sz > list_count) throw Trouble(L"列表元素不合规范");
+			vector<Token> tmp1 = tok.children.at(0).children;
+			for (unsigned int j = 0; j < tmp1.size(); j++){
+				dan1.push_back(tmp1.at(j).value);
+			}
+			if (dan1.size() < 2) throw Trouble(L"胆拖中胆码个数不够");
+			vector<Token> tmp2 = tok.children.at(1).children;
+			for (unsigned int j = 0; j < tmp2.size(); j++){
+				dan2.push_back(tmp2.at(j).value);
+			}
+		}
+		else if (list_count == 3){
+			if (sz > list_count) throw Trouble(L"列表元素不合规范");
+			vector<Token> tmp1 = tok.children.at(0).children;
+			for (unsigned int j = 0; j < tmp1.size(); j++){
+				dan1.push_back(tmp1.at(j).value);
+			}
+			vector<Token> tmp2 = tok.children.at(1).children;
+			for (unsigned int j = 0; j < tmp2.size(); j++){
+				dan2.push_back(tmp2.at(j).value);
+			}
+			vector<Token> tmp3 = tok.children.at(2).children;
+			for (unsigned int j = 0; j < tmp3.size(); j++){
+				dan3.push_back(tmp3.at(j).value);
+			}
+		}
+		else{
+			throw Trouble(L"列表元素不合规范");
+		}
+	}
+	set<int> v;
+	if (list_count == 0 || list_count == 1){
+		set<int> set1;
+		for (unsigned int i = 0; i < dan1.size(); i++){
+			set1.insert(dan1[i]);
+		}
+
+		for (int i = 0; i < 1000; i++){
+			set<int> set0;
+			for (int j = 0; j < 3; j++) set0.insert(pool[i][j]);
+			vector<int> v1(3);
+			vector<int>::iterator it;
+			it = std::set_intersection(set0.begin(), set0.end(), set1.begin(), set1.end(), v1.begin());
+			v1.resize(it - v1.begin());
+			if (v1.size() == 3 || v1.size() >= dan1.size())
+				v.insert(i);
+		}
+	}
+	else if (list_count == 2){
+		set<int> set1,set2;
+		for (unsigned int i = 0; i < dan1.size(); i++){
+			set1.insert(dan1[i]);
+		}
+		for (unsigned int i = 0; i < dan2.size(); i++){
+			set2.insert(dan2[i]);
+		}
+
+		for (int i = 0; i < 1000; i++){
+			set<int> set0;
+			for (int j = 0; j < 3; j++) set0.insert(pool[i][j]);
+			vector<int> v1(3), v2(3);
+			vector<int>::iterator it;
+			it = std::set_intersection(set0.begin(), set0.end(), set1.begin(), set1.end(), v1.begin());
+			v1.resize(it - v1.begin());
+			it = std::set_intersection(set0.begin(), set0.end(), set2.begin(), set2.end(), v2.begin());
+			v2.resize(it - v2.begin());
+			if (v1.size() == 2 && v2.size() == 1)
+				v.insert(i);
+		}
+	}
+	else if (list_count == 3){
+		for (int i = 0; i < 1000; i++){
+			bool bai = false;
+			bool shi = false;
+			bool ge = false;
+			for (unsigned int j = 0; j < dan1.size(); j++){
+				if (pool[i][0] == dan1[j]){
+					bai = true;
+					break;
+				}
+			}
+			for (unsigned int j = 0; j < dan2.size(); j++){
+				if (pool[i][1] == dan2[j]){
+					shi = true;
+					break;
+				}
+			}
+			for (unsigned int j = 0; j < dan3.size(); j++){
+				if (pool[i][2] == dan3[j]){
+					ge = true;
+					break;
+				}
+			}
+			if (bai && shi && ge){
+				v.insert(i);
+			}
+		}
+	}
+	output.push(v);
+}
+
+
+int Env::filter_op(wstring ws, int idx)
+{
+	if (ws == L"个位"){
+		return pool[idx][2];
+	}
+	else if (ws == L"十位"){
+		return pool[idx][1];
+	}
+	else if (ws == L"百位"){
+		return pool[idx][0];
+	}
+	else if (ws == L"和值"){
+		return pool[idx][0] + pool[idx][1] + pool[idx][2];
+	}
+	else if (ws == L"和尾"){
+		return (pool[idx][0] + pool[idx][1] + pool[idx][2]) % 10;
+	}
+	else if (ws == L"号码"){
+		return pool[idx][0] * 100 + pool[idx][1] * 10 + pool[idx][2];
+	}
+	else if (ws == L"跨度" || ws == L"跨距"){
+		return max(max(pool[idx][0], pool[idx][1]), pool[idx][2]) - min(min(pool[idx][0], pool[idx][1]), pool[idx][2]);
+	}
+}
 
 void Env::flt(wstring ws){
+	if (ws == L"胆码"){
+		danma();
+	}
+	/*
 	Token tok1 = pop();
 	Token tok2 = pop();
 	set<int> v;
@@ -419,7 +579,7 @@ void Env::flt(wstring ws){
 			}
 		}
 	}
-	output.push(v);
+	output.push(v);*/
 }
 
 void Env::fnc(wstring ws, int tag)
@@ -479,32 +639,6 @@ void Env::shijihao()
 	int value = draws[len - ref].sj;
 	Token tok2(Tag::NUM, to_wstring(value), value);
 	put(tok2);
-}
-
-int Env::filter_op(wstring ws, int idx)
-{
-	if (ws == L"个位"){
-		return pool[idx][2];
-	}
-	else if (ws == L"十位"){
-		return pool[idx][1];
-	}
-	else if (ws == L"百位"){
-		return pool[idx][0];
-	}
-	else if (ws == L"和值"){
-		return pool[idx][0] + pool[idx][1] + pool[idx][2];
-	}
-	else if (ws == L"和尾"){
-		return (pool[idx][0] + pool[idx][1] + pool[idx][2]) % 10;
-	}
-	else if (ws == L"号码"){
-		return pool[idx][0] * 100 + pool[idx][1] * 10 + pool[idx][2];
-	}
-	else if (ws == L"跨度" || ws == L"跨距"){
-		return max(max(pool[idx][0], pool[idx][1]), pool[idx][2]) - min(min(pool[idx][0], pool[idx][1]), pool[idx][2]);
-	}
-
 }
 
 

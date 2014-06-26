@@ -13,7 +13,7 @@ int _tmain(int argc, _TCHAR* argv[])
 {
 	setlocale(LC_ALL, "chs");
 
-	Lexer lex(L"A:=[1,2,3,[4,5]]; B:= 3; ¸öÎ»!= B;");
+	Lexer lex(L"A:={{1},{3,6,7,9}}; µ¨Âë == A;");
 	wstring ws;
 	//do{
 	//	tok = lex.scan();

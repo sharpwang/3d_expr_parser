@@ -282,14 +282,14 @@ void Parser::atom()
 	else if (look.tag == Tag::HANZ){
 		function();
 	}
-	else if (look.tag == Tag::LBRK){
+	else if (look.tag == Tag::LBRC){
 		Token tok = look;
-		match(Tag::LBRK);
+		match(Tag::LBRC);
 		push_var(tok);
 		atom();
 		list();
 		tok = look;
-		match(Tag::RBRK);
+		match(Tag::RBRC);
 		push_var(tok);
 
 	}

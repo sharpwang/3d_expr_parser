@@ -53,7 +53,7 @@ public:
 	void gewei();
 	void shangqi(int tag);
 	void shijihao();
-
+	void danma();
 
 	int filter_op(wstring ws, int idx);
 	Env();

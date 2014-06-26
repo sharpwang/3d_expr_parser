@@ -18,7 +18,7 @@ public:
 		FLT = 277, FNC = 278, FNC0 = 281,						//根据语义分析，修改HANZ = 263的Token，FNC0表示不带参数的函数
 		DEF = 279, REF =  280,									//根据语义分析，把ID = 256的Token分为定义项和引用项
 		IF = 281,												//逻辑判断语句 假如
-		LBRK = 282, RBRK = 283,									//中括号 bracket []
+		LBRC = 282, RBRC = 283,									//大括号 brace {}
 		LIST = 284
 	};
 };
